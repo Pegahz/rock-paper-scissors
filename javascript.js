@@ -11,17 +11,18 @@ function standardPlayerSelection(playerSelection) {
 }
 
 //This function plays one round of the game
-function playRound(playerSelection, computerSelection) {
-    console.log(playerSelection);
-    console.log(computerSelection);
+function playRound(playerSelection, computerSelection, playerScore, computerScore) {
+    const div = document.querySelector('div');
 
-    //How the plaer wins
+    //How the player wins
     if (computerSelection === 'Rock' && playerSelection === 'Paper' ||
         computerSelection === 'Paper' && playerSelection === 'Scissors' ||
         computerSelection === 'Scissors' && playerSelection === 'Rock') 
         {
-        console.log(`You Win! ${playerSelection} beats ${computerSelection}`);
-        return 1;
+        playerScore++;
+        div.textContent = `Player: ${playerScore}
+                            Computer: ${computerScore}`;
+        return [playerScore, computerScore];
     }
 
     //How the computer wins
@@ -29,32 +30,49 @@ function playRound(playerSelection, computerSelection) {
         computerSelection === 'Paper' && playerSelection === 'Rock' ||
         computerSelection === 'Scissors' && playerSelection === 'Paper') 
         {
-        console.log(`You Lose! ${computerSelection} beats ${playerSelection}`);
-        return -1;
+        computerScore++;
+        div.textContent = `Player: ${playerScore}
+                            Computer: ${computerScore}`;
+        return [playerScore, computerScore];
     }
 
-    //A draw
+    //A tie
     if (computerSelection === playerSelection) {
-        console.log(`Draw! ${computerSelection} can't beat ${playerSelection}`);
-        return 0;
+        div.textContent = `Player: ${playerScore}
+                            Computer: ${computerScore}`;
+        return [playerScore, computerScore];
     }
 }
 
 //This function plays 5 round of the game and after counting the scores detemines who wins
 function game() {
-    let score, playerScore = 0, computerScore = 0;
-    for (let i = 0; i < 5; i++) {
-        const playerSelection = standardPlayerSelection(prompt("Rock, Paper or Scissors?"));
-        const computerSelection = getComputerChoice();
-        score = playRound(playerSelection, computerSelection);
-        (score === 1) ? playerScore++ : (score === -1) ? computerScore++ : null;
-    }
+    let playerScore = 0, computerScore = 0;
+    const buttons = document.querySelectorAll('button');
+    buttons.forEach((button) => {
+        button.addEventListener('click', () => {
+            const computerSelection = getComputerChoice();
+            const playerSelection = standardPlayerSelection(button.id);
+            [playerScore, computerScore] = playRound(playerSelection, computerSelection, playerScore, computerScore);
+            if (playerScore === 5 || computerScore === 5) {
+                endGame(playerScore, computerScore, playerScore, computerScore);
+                return;
+            }
+        });
+    });
+    return;
+}
+
+// This function finishes the game
+function endGame(playerScore, computerScore, playerScore, computerScore) {
+    const div = document.querySelector('div');
     if (playerScore > computerScore) {
-        console.log("You are the winner!");
+        div.textContent = `You won!\n
+                           Player: ${playerScore}\n
+                           Computer: ${computerScore}`;
     } else if (playerScore < computerScore) {
-        console.log("The computer is the winner!");
-    } else {
-        console.log("No winner!");
+        div.textContent = `You lost!\n
+                           Player: ${playerScore}\n
+                           Computer: ${computerScore}`;
     }
 }
 
